@@ -1,0 +1,21 @@
+name = "ashtonk-lobbies"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Serve static frontend from the repo root
+[assets]
+directory = "../"
+binding = "ASSETS"
+
+[[durable_objects.bindings]]
+name = "LOBBY_REGISTRY"
+class_name = "LobbyRegistry"
+
+[[durable_objects.bindings]]
+name = "LOBBY_ROOM"
+class_name = "LobbyRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LobbyRegistry", "LobbyRoom"]

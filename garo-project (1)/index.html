@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ashtonk!Mania — Lobbies</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="src/css/lobby.css" />
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🎵</span>
+      <span class="title">Ashtonk!Mania Lobbies</span>
+    </div>
+    <div class="user-chip">
+      <input id="usernameInput" type="text" placeholder="Username" maxlength="20" />
+      <button id="saveUserBtn" class="btn btn-ghost">Save</button>
+    </div>
+  </header>
+
+  <main id="mainView">
+    <!-- LOBBY BROWSER -->
+    <section id="browserView" class="view active">
+      <div class="browser-header">
+        <div class="left">
+          <h2>Public Lobbies</h2>
+          <span id="lobbyCount" class="muted">0 active</span>
+        </div>
+        <div class="right">
+          <input id="searchInput" type="text" placeholder="Search lobbies..." />
+          <button id="refreshBtn" class="btn btn-ghost">↻ Refresh</button>
+          <button id="createBtn" class="btn btn-primary">+ Create Lobby</button>
+          <button id="joinPrivateBtn" class="btn btn-secondary">🔒 Join by Code</button>
+        </div>
+      </div>
+
+      <div id="lobbyGrid" class="lobby-grid"></div>
+      <div id="emptyState" class="empty-state hidden">
+        <div class="empty-icon">🎮</div>
+        <h3>No lobbies yet</h3>
+        <p>Be the first to create one!</p>
+      </div>
+    </section>
+
+    <!-- IN-LOBBY VIEW -->
+    <section id="lobbyView" class="view">
+      <div class="lobby-header">
+        <button id="leaveLobbyBtn" class="btn btn-ghost">← Leave</button>
+        <div class="lobby-title-block">
+          <h2 id="lobbyName">Lobby Name</h2>
+          <div class="lobby-meta">
+            <span id="lobbyVisibility" class="badge">Public</span>
+            <span id="lobbyCode" class="badge code hidden"></span>
+            <span id="lobbyPlayerCount" class="badge">0/8</span>
+          </div>
+        </div>
+        <div class="lobby-actions">
+          <button id="copyCodeBtn" class="btn btn-ghost hidden">📋 Copy Code</button>
+          <button id="startGameBtn" class="btn btn-primary hidden">▶ Start Game</button>
+        </div>
+      </div>
+
+      <div class="lobby-body">
+        <div class="players-panel">
+          <h3>Players</h3>
+          <div id="playersList" class="players-list"></div>
+        </div>
+
+        <div class="chat-panel">
+          <h3>Chat</h3>
+          <div id="chatLog" class="chat-log"></div>
+          <form id="chatForm" class="chat-form">
+            <input id="chatInput" type="text" placeholder="Type a message..." maxlength="200" autocomplete="off" />
+            <button type="submit" class="btn btn-primary">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- CREATE LOBBY MODAL -->
+  <div id="createModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Create Lobby</h3>
+        <button class="modal-close" data-close="createModal">×</button>
+      </div>
+      <div class="modal-body">
+        <label class="field">
+          <span>Lobby Name</span>
+          <input id="newLobbyName" type="text" maxlength="40" placeholder="My Cool Lobby" />
+        </label>
+        <label class="field">
+          <span>Max Players</span>
+          <select id="newLobbyMaxPlayers">
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="8" selected>8</option>
+            <option value="16">16</option>
+          </select>
+        </label>
+        <div class="field">
+          <span>Visibility</span>
+          <div class="radio-row">
+            <label><input type="radio" name="visibility" value="public" checked /> 🌐 Public</label>
+            <label><input type="radio" name="visibility" value="private" /> 🔒 Private</label>
+          </div>
+        </div>
+        <label class="field" id="passwordField" style="display:none">
+          <span>Password (optional)</span>
+          <input id="newLobbyPassword" type="password" maxlength="32" placeholder="Leave empty for code-only" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" data-close="createModal">Cancel</button>
+        <button id="confirmCreateBtn" class="btn btn-primary">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOIN PRIVATE MODAL -->
+  <div id="joinModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Join Private Lobby</h3>
+        <button class="modal-close" data-close="joinModal">×</button>
+      </div>
+      <div class="modal-body">
+        <label class="field">
+          <span>Lobby Code</span>
+          <input id="joinCodeInput" type="text" maxlength="6" placeholder="ABC123" style="text-transform:uppercase" />
+        </label>
+        <label class="field">
+          <span>Password (if required)</span>
+          <input id="joinPasswordInput" type="password" maxlength="32" placeholder="Leave empty if none" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" data-close="joinModal">Cancel</button>
+        <button id="confirmJoinBtn" class="btn btn-primary">Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSWORD PROMPT MODAL -->
+  <div id="passwordModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Password Required</h3>
+        <button class="modal-close" data-close="passwordModal">×</button>
+      </div>
+      <div class="modal-body">
+        <label class="field">
+          <span>Enter password for "<span id="pwdLobbyName"></span>"</span>
+          <input id="pwdInput" type="password" maxlength="32" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" data-close="passwordModal">Cancel</button>
+        <button id="confirmPwdBtn" class="btn btn-primary">Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<script type="module" src="src/js/main.js"></script>
+</body>
+</html>
